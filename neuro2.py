@@ -55,65 +55,45 @@ x = []
 y = []
 for i in range(1000):
     x.append(a-0.5+i*(1+2*b-a)/1000)
+    #x.append(a-0.25+i*(1+b-a)/1000)
 for i in range(1000):
     y.append(func(x[i]))
 
-measures = []
-normas = []
-gens = []
-res = []
-s = 1
-#for gen in range(500,5000,100):
-    #gens.append(gen)
-    #for i in range(gen):
-    #    s = period()
-for window_size in range(2,20):
-    res = []
-    weights = [0.0]
-    for i in range(window_size):
-        weights.append(0.0)
-    for i in range(window_size+1):
-        res.append(0)
-    s = 1
-    normas.append(window_size)
-    while (epsilon < math.sqrt(s)):
-        s = period()
-    measure = 0.0
-    new_inputs = [inputs[N-1]]                        #проверка
-    for i in range(N):
-        new_inputs.append(b+i*(b-a)/N)
-    new_answers = []
-    answers = []
-    for i in range(N):
-        new_answers.append(func(new_inputs[i]))
-    for i in range(window_size):
-        answers.append(right_answers[N-window_size+i])
-    new_values = [right_answers[N-1]]
-    for i in range(N):
-        new_value = iteration(answers)
-        mistake = func(new_inputs[i+1])-new_value
-        #print(measure)
-        #print(new_value)
-        #print(new_answers)
-        measure += mistake*mistake
-        answers = shift(answers, new_value)
-        new_values.append(new_value)
-    measures.append(math.sqrt(measure))
-    for i in range(window_size+1):
-        res[i]=weights[i]
-        weights[i]*=0
+measure = 1
+s = period()
+step=0
+while (epsilon < math.sqrt(s)):
+    s = period()
+    step+=1
+    if (step%50) == 0:
+        print("\nStep:",step)
+        print("Weights: ", end = "")
+        for w in weights: print(round(w,3), end = "\t")
+        print("\neps =",(round(math.sqrt(s),3)))
+measure = 0.0
+new_inputs = [inputs[N-1]]                        #проверка
+for i in range(N):
+    new_inputs.append(b+i*(b-a)/N)
+new_answers = []
+answers = []
+for i in range(N):
+    new_answers.append(func(new_inputs[i]))
+for i in range(window_size):
+    answers.append(right_answers[N-window_size+i])
+new_values = [right_answers[N-1]]
+for i in range(N):
+    new_value = iteration(answers)
+    mistake = func(new_inputs[i+1])-new_value
+    measure += mistake*mistake
+    answers = shift(answers, new_value)
+    new_values.append(new_value)
 
+print("\nStep:",step)
 print("Weights: ", end = "")
-for r in res: print(round(r,3), end = "\t")
-print("\nError =",measure)
+for w in weights: print(round(w,3), end = "\t")
+print("\nE =",(round(math.sqrt(measure),3)))
+
 fig = plt.figure()
-#plt.axis([0, 19, 0, 20])
-#plt.plot(gens, measures)
-plt.plot(normas, measures)
-plt.grid(True)
-plt.show()
-        
-fig2 = plt.figure()
 plt.plot(x, y)
 plt.plot(inputs, right_answers, marker='.', color='r')
 plt.plot(new_inputs, new_values, marker='.', color='g')
